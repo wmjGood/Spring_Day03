@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mybatis_spring.dao.bill.BillDao">
+    <resultMap id="bill" type="SmbmsBill">
+        <id property="id" column="id"></id>
+        <result property="billCode" column="billCode"></result>
+        <result property="productName" column="productName"></result>
+        <result property="productDesc" column="productDesc"></result>
+        <result property="productUnit" column="productUnit"></result>
+        <result property="productCount" column="productCount"></result>
+        <result property="totalPrice" column="totalPrice"></result>
+        <result property="providerId" column="providerId"></result>
+    </resultMap>
+      <insert id="addBill" parameterType="SmbmsBill">
+          INSERT INTO smbms_bill(billCode,productName,productDesc,productUnit,productCount,totalPrice,providerId)
+          VALUES(#{billCode},#{productName},#{productDesc},#{productUnit},#{productCount},#{totalPrice},#{providerId})
+      </insert>
+
+    <update id="updateBill" parameterType="SmbmsBill">
+        UPDATE smbms_bill
+        <trim prefix="set" suffixOverrides=",">
+            <if test="billCode!=null">
+                billCode=#{billCode},
+            </if>
+            <if test="productUnit!=null">
+                productUnit=#{productUnit},
+            </if>
+
+        </trim>
+        <where>
+            id=#{id}
+        </where>
+    </update>
+
+    <delete id="deleteBill" parameterType="int">
+        DELETE FROM smbms_bill
+        <where>
+        id=#{id}
+       </where>
+    </delete>
+</mapper>

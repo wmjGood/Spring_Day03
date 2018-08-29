@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd
+       ">
+    <!--数据源-->
+    <bean id="datasource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver"></property>
+        <property name="url" value="jdbc:mysql:///smbms">
+
+        </property>
+        <property name="username" value="root"></property>
+        <property name="password" value="0000"></property>
+    </bean>
+
+
+    <!--配置SqlsessionFactoryBean-->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!--引用数据源-->
+        <property name="dataSource" ref="datasource"></property>
+        <!--引用mybatis配置文件中的配置-->
+        <property name="configLocation" value="classpath:mybatis.xml"></property>
+
+    </bean>
+
+    <!-- 配置sql映射文件
+     <property name="mapperLocations">
+         <list>
+             <value>mybatis_spring/dao/**/*.xml</value>
+         </list>
+     </property>-->
+
+    <!--配置SqlSessionTemplate-->
+    <!--创建sqlSessionTemplate实例时需要通过构造方法引入SqlsessionFactory的实例-->
+    <bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+        <constructor-arg name="sqlSessionFactory" ref="sqlSessionFactory"></constructor-arg>
+    </bean>
+    <!-- 配置dao组件并注入SqlSessionTemplate的实例
+     <bean id="userMapper" class="mybatis_spring.dao.impl.UserMapperImpl">
+         <property name="sqlsession" ref="sqlSessionTemplate"></property>
+     </bean>-->
+    <!--不用使用impl类，直接映射接口中的方法 使用MapperFactoryBean -->
+    <!--<bean id="userMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+        <property name="mapperInterface" value="mybatis_spring.dao.UserMapper"></property>
+        <property name="sqlSessionFactory" ref="sqlSessionFactory"></property>
+    </bean>-->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="mybatis_spring.dao"></property>
+    </bean>
+    <context:component-scan base-package="mybatis_spring.service"></context:component-scan>
+    <!--<bean id="userService" class="mybatis_spring.service.UserServiceImpl">
+        <property name="userMapper" ref="userMapper"></property>
+    </bean>-->
+
+
+
+</beans>

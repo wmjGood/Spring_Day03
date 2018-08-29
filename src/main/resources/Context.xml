@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx.xsd
+
+       ">
+    <!--数据源-->
+    <bean id="datasource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver"></property>
+        <property name="url" value="jdbc:mysql:///smbms">
+
+        </property>
+        <property name="username" value="root"></property>
+        <property name="password" value="0000"></property>
+    </bean>
+
+
+    <!--配置SqlsessionFactoryBean-->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!--引用数据源-->
+        <property name="dataSource" ref="datasource"></property>
+        <!--引用mybatis配置文件中的配置-->
+        <property name="configLocation" value="classpath:mybatis.xml"></property>
+
+    </bean>
+    <!--配置SqlSessionTemplate-->
+    <!--创建sqlSessionTemplate实例时需要通过构造方法引入SqlsessionFactory的实例-->
+    <bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+        <constructor-arg name="sqlSessionFactory" ref="sqlSessionFactory"></constructor-arg>
+    </bean>
+    <!-- 配置dao组件并注入SqlSessionTemplate的实例-->
+
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="mybatis_spring.dao"></property>
+    </bean>
+    <!--配置service-->
+    <context:component-scan base-package="mybatis_spring.service"></context:component-scan>
+
+    <!--定义事务管理器-->
+     <bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+         <property name="dataSource" ref="datasource"></property>
+     </bean>
+    <!--声明式事务-->
+
+ <!--   &lt;!&ndash;指定事务管理器设置事务属性&ndash;&gt;
+     <tx:advice id="txAdvice" transaction-manager="txManager">
+         &lt;!&ndash;定义属性，声明事务规则&ndash;&gt;
+         <tx:attributes>
+             <tx:method name="find*" propagation="REQUIRED"/>
+
+         </tx:attributes>
+
+     </tx:advice>
+    &lt;!&ndash;切点&ndash;&gt;
+    <aop:config>
+       <aop:pointcut id="serviceMethod"  expression="execution(* mybatis_spring.service..*.*(..))"/>
+       <aop:advisor advice-ref="txAdvice" pointcut-ref="serviceMethod"/>
+    </aop:config>-->
+
+    <!--注解式事务-->
+      <tx:annotation-driven transaction-manager="txManager"/>
+
+
+</beans>

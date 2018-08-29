@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mybatis_spring.dao.UserMapper">
+    <sql id="providerInfo">
+        SELECT id,proCode,proName,proDesc,proContact,proPhone,proAddress FROM smbms_provider
+    </sql>
+    <!--查詢所有-->
+    <select id="finaAll" resultType="SmbmsProvider" >
+    <include refid="providerInfo" />
+    </select>
+    <!--按名稱查詢-->
+    <select id="findProviderByName" parameterType="String" resultType="SmbmsProvider">
+        <include refid="providerInfo" />
+        <where>
+          and  proName  LIKE  CONCAT ('%',#{proName},'%')
+        </where>
+    </select>
+
+    <!--增加-->
+    <insert id="add" parameterType="SmbmsProvider" >
+     <if test="proCode!=null and proName!=null and proDesc!=null and proContact!=null ">
+      INSERT INTO smbms_provider(proCode,proName,proDesc,proContact)
+      VALUES(#{proCode},#{proName},#{proDesc},#{proContact})
+     </if>
+    </insert>
+
+    <delete id="delete" parameterType="int">
+        DELETE FROM smbms_provider
+         <where>
+             id=#{id}
+         </where>
+
+    </delete>
+
+    <update id="update" parameterType="SmbmsProvider">
+        UPDATE smbms_provider
+       <trim prefix="set" suffixOverrides=",">
+            <if test="proName!=null and proName!=''">
+                proName=#{proName},
+            </if>
+            <if test="proDesc!=null and proDesc!=''">
+                proDesc=#{proDesc},
+            </if>
+       </trim>
+        <where>
+            id=#{id}
+        </where>
+    </update>
+
+</mapper>
